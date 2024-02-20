@@ -1,6 +1,7 @@
 # Conways Game of Life
-**Explore John Conways famous Game of Life:**\
-https://jv-schneider.github.io/game-of-life/
+<br></br>
+**Try John Conways famous Game of Life:**
+   https://jv-schneider.github.io/game-of-life/
 
 <br></br>
 
