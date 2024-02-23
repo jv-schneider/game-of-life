@@ -62,8 +62,6 @@ function calculateGeneration() {
 
   getNeighbors();
 
-  console.log(speed);
-
   // apply game of life rules
 
   drawGrid();
