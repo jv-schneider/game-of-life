@@ -9,7 +9,7 @@ const ctx = canvas.getContext("2d");
 
 let grid = [];
 let pixelSize = 50;
-let speed = 500;
+let speed = 600;
 
 let canvasWidth;
 let canvasHeight;
@@ -61,6 +61,8 @@ function calculateGeneration() {
   // get state of pixels surrounding grid[i]
 
   getNeighbors();
+
+  console.log(speed);
 
   // apply game of life rules
 
@@ -156,14 +158,20 @@ function changePixelSize() {
   sizeCanvas();
 }
 
-function changeSpeed() {
+function changeSpeed(event) {
   clearInterval(simInterval);
-  if (startButton.innerHTML == "stop") {
-    startButton.innerHTML = "start";
-    startButton.classList.remove("red-button");
-    startButton.classList.add("green-button");
+
+  if (event.key == "ArrowRight") {
+    speed -= 50;
+  } else if (event.key == "ArrowLeft") {
+    speed += 50;
+  } else {
+    speed = -parseInt(speedSlider.value);
   }
-  speed = parseInt(speedSlider.value);
+
+  if (startButton.innerHTML == "stop") {
+    simInterval = setInterval(calculateGeneration, speed);
+  }
 }
 
 // If a pixel is alive, color it white
@@ -264,5 +272,11 @@ window.addEventListener("resize", sizeCanvas);
 canvas.addEventListener("click", drawPixel);
 clearButton.addEventListener("click", clear);
 startButton.addEventListener("click", startStopSimulation);
+window.addEventListener("keydown", (event) => {
+  if (event.key == "Enter") {
+    startStopSimulation();
+  }
+});
 sizeSlider.addEventListener("input", changePixelSize);
 speedSlider.addEventListener("input", changeSpeed);
+window.addEventListener("keydown", changeSpeed);
