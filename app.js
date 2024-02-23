@@ -8,17 +8,21 @@ const ctx = canvas.getContext("2d");
 // Important global variables
 
 let grid = [];
-let pixelSize = 25;
+let pixelSize = 50;
+let speed = 500;
 
 let canvasWidth;
 let canvasHeight;
 
+let simInterval;
+
 // Classes
 
 class Pixel {
-  constructor(state, position) {
+  constructor(state, position, neighborss) {
     this.state = state;
     this.position = position;
+    this.neighborss = neighborss;
   }
 }
 
@@ -27,21 +31,139 @@ class Pixel {
 sizeCanvas();
 drawGrid();
 
-function startSimulation() {
-  pixelSize = parseInt(sizeSlider.value);
-  sizeCanvas();
-
-  for (let i = 0; i < grid.length; i++) {
-    if (i % 2 == 0) {
-      grid[i].state = 1;
-    }
+function startStopSimulation() {
+  if (startButton.innerHTML == "start") {
+    clearInterval(simInterval);
+    simInterval = setInterval(calculateGeneration, speed);
+    startButton.innerHTML = "stop";
+    startButton.classList.remove("green-button");
+    startButton.classList.add("red-button");
+  } else if (startButton.innerHTML == "stop") {
+    clearInterval(simInterval);
+    startButton.innerHTML = "start";
+    startButton.classList.remove("red-button");
+    startButton.classList.add("green-button");
   }
-  drawGrid();
 }
 
 function clear() {
+  clearInterval(simInterval);
+  if (startButton.innerHTML == "stop") {
+    startButton.innerHTML = "start";
+    startButton.classList.remove("red-button");
+    startButton.classList.add("green-button");
+  }
   resetGrid();
   drawGrid();
+}
+
+function calculateGeneration() {
+  // get state of pixels surrounding grid[i]
+
+  getNeighbors();
+
+  // apply game of life rules
+
+  drawGrid();
+  for (let i = 0; i < grid.length; i++) {
+    if (
+      grid[i].position[0] > 0 &&
+      grid[i].position[0] < simulationSize[0] - pixelSize &&
+      grid[i].position[1] > 0 &&
+      grid[i].position[1] < simulationSize[1] - pixelSize
+    ) {
+      // Pixel dead, but 3 neighborss are alive: pixel alive
+      if (
+        grid[i].state == 0 &&
+        grid[i].neighbors.filter((x) => x == 1).length == 3
+      ) {
+        grid[i].state = 1;
+      }
+
+      // Pixel alive, but less than 2 neighborss alive: pixel dead
+      if (
+        grid[i].state == 1 &&
+        grid[i].neighbors.filter((x) => x == 1).length < 2
+      ) {
+        grid[i].state = 0;
+      }
+
+      // Pixel alive and 2 or 3 neighborss alive: pixel stays alive
+      // else if (
+      //   grid[i].state == 1 &&
+      //   (pixelState.filter((x) => x == 1).length == 2 ||
+      //     pixelState.filter((x) => x == 1).length == 3)
+      // ) {
+      //   grid[i].state = 1;
+      // }
+
+      // Pixel alive, but more than 3 neighborss alive: pixel dies
+      if (
+        grid[i].state == 1 &&
+        grid[i].neighbors.filter((x) => x == 1).length > 3
+      ) {
+        grid[i].state = 0;
+      }
+    }
+  }
+}
+
+function getNeighbors() {
+  for (let i = 0; i < grid.length; i++) {
+    grid[i].neighbors = [];
+  }
+  for (let i = 0; i < grid.length; i++) {
+    if (
+      grid[i].position[0] > 0 &&
+      grid[i].position[0] < simulationSize[0] - pixelSize &&
+      grid[i].position[1] > 0 &&
+      grid[i].position[1] < simulationSize[1] - pixelSize
+    ) {
+      // Get state of the surrounding pixels
+
+      grid[i].neighbors.push(grid[i + 1].state);
+      grid[i].neighbors.push(grid[i - 1].state);
+
+      grid[i].neighbors.push(grid[i + simulationSize[0] / pixelSize + 1].state);
+      grid[i].neighbors.push(grid[i + simulationSize[0] / pixelSize].state);
+      grid[i].neighbors.push(grid[i + simulationSize[0] / pixelSize - 1].state);
+
+      grid[i].neighbors.push(grid[i - simulationSize[0] / pixelSize + 1].state);
+      grid[i].neighbors.push(grid[i - simulationSize[0] / pixelSize].state);
+      grid[i].neighbors.push(grid[i - simulationSize[0] / pixelSize - 1].state);
+    }
+  }
+}
+
+function changePixelSize() {
+  clearInterval(simInterval);
+  if (startButton.innerHTML == "stop") {
+    startButton.innerHTML = "start";
+    startButton.classList.remove("red-button");
+    startButton.classList.add("green-button");
+  }
+  if (sizeSlider.value == 35) {
+    pixelSize = 40;
+  } else if (sizeSlider.value < 25) {
+    pixelSize = 15;
+  } else if (sizeSlider.value == 65) {
+    pixelSize = 60;
+  } else if (sizeSlider.value == 70) {
+    pixelSize = 75;
+  } else {
+    pixelSize = parseInt(sizeSlider.value);
+  }
+  sizeCanvas();
+}
+
+function changeSpeed() {
+  clearInterval(simInterval);
+  if (startButton.innerHTML == "stop") {
+    startButton.innerHTML = "start";
+    startButton.classList.remove("red-button");
+    startButton.classList.add("green-button");
+  }
+  speed = parseInt(speedSlider.value);
 }
 
 // If a pixel is alive, color it white
@@ -116,7 +238,7 @@ function resetGrid() {
 
   for (let i = 0; i < canvasHeight - pixelSize; i += pixelSize) {
     for (let j = 0; j < canvasWidth - pixelSize; j += pixelSize) {
-      grid.push(new Pixel(0, [j, i]));
+      grid.push(new Pixel(0, [j, i], []));
     }
   }
 }
@@ -141,4 +263,6 @@ function drawLines() {
 window.addEventListener("resize", sizeCanvas);
 canvas.addEventListener("click", drawPixel);
 clearButton.addEventListener("click", clear);
-startButton.addEventListener("click", startSimulation);
+startButton.addEventListener("click", startStopSimulation);
+sizeSlider.addEventListener("input", changePixelSize);
+speedSlider.addEventListener("input", changeSpeed);
