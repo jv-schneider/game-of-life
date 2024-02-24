@@ -8,6 +8,8 @@ body {
   margin: 0 !important;
   padding: 0 !important;
   background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: sans-serif;
 }
 
 body::-webkit-scrollbar {
@@ -15,7 +17,7 @@ body::-webkit-scrollbar {
 }
 
 canvas {
-  margin: 50px 50px;
+  margin: 25px 50px;
 }
 
 div#controls {
@@ -27,11 +29,30 @@ div#controls {
   max-width: 70vw;
   height: auto;
   padding: 25px;
-  margin: 75px 15vw;
+  margin: 0px 15vw;
   background-color: #ffffff06;
   border: 1px solid var(--hover-color);
   border-radius: 15px;
   flex-wrap: wrap;
+}
+
+div#info {
+  max-width: 70vw;
+  padding: 25px;
+  margin: 50px 15vw;
+  background-color: #ffffff06;
+  border: 1px solid var(--hover-color);
+  border-radius: 15px;
+  flex-wrap: wrap;
+}
+
+div#info > h1 {
+  font-size: 22px;
+  margin-bottom: 30px;
+}
+
+div#info > p {
+  font-size: 16px;
 }
 
 button {
@@ -97,7 +118,7 @@ footer {
   height: fit-content;
   background-color: var(--background-color);
   font-family: sans-serif;
-  margin-top: 400px;
+  margin-top: 300px;
 }
 
 .footer-icon > svg {
